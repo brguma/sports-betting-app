@@ -1,5 +1,5 @@
 import React, { useState, useMemo, useEffect } from 'react';
-import { Search, Plus, Calendar, Users, Trophy, User, FileText, Edit2, Trash2, Tag, X, Settings, Download, Upload, Moon, Sun, Star, Copy, BarChart3, Bell, Clock, TrendingUp, FolderOpen, HelpCircle } from 'lucide-react';
+import { Search, Plus, Calendar, Users, Trophy, User, FileText, Edit2, Trash2, Tag, X, Settings, Download, Upload, Moon, Sun, Star, Copy, BarChart3, Bell, Clock, TrendingUp, FolderOpen, HelpCircle, Building, Globe } from 'lucide-react';
 
 const SportsNotePlatform = () => {
   // Cores predefinidas para os esportes
@@ -28,8 +28,8 @@ const SportsNotePlatform = () => {
       content: 'Gabigol tem melhor performance em jogos em casa, especialmente contra times da zona de rebaixamento. Taxa de conversão de 78% nos últimos 10 jogos.',
       tags: ['atacante', 'casa', 'conversão'],
       favorite: false,
-      noteType: 'individual', // 'individual' ou 'confronto'
-      confrontoTeams: [], // Array com os times/jogadores do confronto
+      noteType: 'individual', // 'individual', 'confronto', 'time', 'campeonato'
+      confrontoTeams: [],
       date: '2024-08-01'
     },
     {
@@ -58,6 +58,34 @@ const SportsNotePlatform = () => {
       noteType: 'confronto',
       confrontoTeams: ['Vasco', 'Flamengo'],
       date: '2024-08-03'
+    },
+    {
+      id: 4,
+      sport: 'futebol',
+      year: '2024',
+      championship: 'Brasileirão Série A',
+      team: 'Flamengo',
+      player: '',
+      content: 'O Flamengo tem excelente retrospecto jogando no Maracanã. Nos últimos 20 jogos em casa, apenas 2 derrotas. Time muito forte defensivamente quando joga em casa.',
+      tags: ['casa', 'maracanã', 'defesa'],
+      favorite: false,
+      noteType: 'time',
+      confrontoTeams: [],
+      date: '2024-08-06'
+    },
+    {
+      id: 5,
+      sport: 'futebol',
+      year: '2024',
+      championship: 'Brasileirão Série A',
+      team: '',
+      player: '',
+      content: 'O Brasileirão 2024 tem sido muito equilibrado. Muitos jogos com poucos gols na primeira rodada. Recomendo cautela com apostas em over 2.5 nas primeiras 10 rodadas.',
+      tags: ['equilibrado', 'poucos gols', 'cautela'],
+      favorite: true,
+      noteType: 'campeonato',
+      confrontoTeams: [],
+      date: '2024-08-07'
     }
   ]);
 
@@ -223,7 +251,7 @@ const SportsNotePlatform = () => {
     const backupData = {
       ...data,
       backupDate: new Date().toISOString(),
-      version: '1.2'
+      version: '1.3'
     };
     
     const blob = new Blob([JSON.stringify(backupData, null, 2)], { 
@@ -294,9 +322,9 @@ const SportsNotePlatform = () => {
     const items = new Set();
     
     notes.forEach(note => {
-      if (note.noteType === 'individual') {
+      if (note.noteType === 'individual' || note.noteType === 'time') {
         if (note.team) items.add(note.team);
-        if (note.player && note.player !== 'Confronto') items.add(note.player);
+        if (note.player && note.player !== 'Confronto' && note.player !== '') items.add(note.player);
       } else if (note.noteType === 'confronto' && note.confrontoTeams) {
         note.confrontoTeams.forEach(team => items.add(team));
       }
@@ -315,7 +343,7 @@ const SportsNotePlatform = () => {
 
     if (selectedTeamPlayer !== 'todos') {
       filtered = filtered.filter(note => {
-        if (note.noteType === 'individual') {
+        if (note.noteType === 'individual' || note.noteType === 'time') {
           return note.team === selectedTeamPlayer || note.player === selectedTeamPlayer;
         } else if (note.noteType === 'confronto') {
           return note.confrontoTeams && note.confrontoTeams.includes(selectedTeamPlayer);
@@ -437,8 +465,19 @@ const SportsNotePlatform = () => {
       return;
     }
 
+    // Validação baseada no tipo de nota
     if (newNote.noteType === 'individual' && !newNote.player) {
       alert('Para notas individuais, preencha o campo jogador');
+      return;
+    }
+
+    if (newNote.noteType === 'time' && !newNote.team) {
+      alert('Para notas de time, preencha o campo time');
+      return;
+    }
+
+    if (newNote.noteType === 'campeonato' && !newNote.championship) {
+      alert('Para notas de campeonato, preencha o campo campeonato');
       return;
     }
 
@@ -465,13 +504,36 @@ const SportsNotePlatform = () => {
       ? processConfrontoTeams(newNote.confrontoTeam1, newNote.confrontoTeam2, newNote.noteType)
       : [];
 
+    // Definir player e team baseado no tipo
+    let finalPlayer = '';
+    let finalTeam = '';
+
+    switch (newNote.noteType) {
+      case 'individual':
+        finalPlayer = newNote.player;
+        finalTeam = newNote.team;
+        break;
+      case 'time':
+        finalPlayer = '';
+        finalTeam = newNote.team;
+        break;
+      case 'campeonato':
+        finalPlayer = '';
+        finalTeam = '';
+        break;
+      case 'confronto':
+        finalPlayer = 'Confronto';
+        finalTeam = `${newNote.confrontoTeam1} vs ${newNote.confrontoTeam2}`;
+        break;
+    }
+
     const note = {
       id: Date.now(),
       ...newNote,
       sport: finalSport,
       confrontoTeams,
-      player: newNote.noteType === 'confronto' ? 'Confronto' : newNote.player,
-      team: newNote.noteType === 'confronto' ? `${newNote.confrontoTeam1} vs ${newNote.confrontoTeam2}` : newNote.team,
+      player: finalPlayer,
+      team: finalTeam,
       date: newNote.date || new Date().toISOString().split('T')[0]
     };
 
@@ -536,8 +598,19 @@ const SportsNotePlatform = () => {
       return;
     }
 
+    // Validação baseada no tipo de nota
     if (newNote.noteType === 'individual' && !newNote.player) {
       alert('Para notas individuais, preencha o campo jogador');
+      return;
+    }
+
+    if (newNote.noteType === 'time' && !newNote.team) {
+      alert('Para notas de time, preencha o campo time');
+      return;
+    }
+
+    if (newNote.noteType === 'campeonato' && !newNote.championship) {
+      alert('Para notas de campeonato, preencha o campo campeonato');
       return;
     }
 
@@ -564,6 +637,29 @@ const SportsNotePlatform = () => {
       ? processConfrontoTeams(newNote.confrontoTeam1, newNote.confrontoTeam2, newNote.noteType)
       : [];
 
+    // Definir player e team baseado no tipo
+    let finalPlayer = '';
+    let finalTeam = '';
+
+    switch (newNote.noteType) {
+      case 'individual':
+        finalPlayer = newNote.player;
+        finalTeam = newNote.team;
+        break;
+      case 'time':
+        finalPlayer = '';
+        finalTeam = newNote.team;
+        break;
+      case 'campeonato':
+        finalPlayer = '';
+        finalTeam = '';
+        break;
+      case 'confronto':
+        finalPlayer = 'Confronto';
+        finalTeam = `${newNote.confrontoTeam1} vs ${newNote.confrontoTeam2}`;
+        break;
+    }
+
     const updatedNotes = notes.map(note => 
       note.id === editingNote.id 
         ? { 
@@ -571,8 +667,8 @@ const SportsNotePlatform = () => {
             id: editingNote.id, 
             sport: finalSport,
             confrontoTeams,
-            player: newNote.noteType === 'confronto' ? 'Confronto' : newNote.player,
-            team: newNote.noteType === 'confronto' ? `${newNote.confrontoTeam1} vs ${newNote.confrontoTeam2}` : newNote.team
+            player: finalPlayer,
+            team: finalTeam
           }
         : note
     );
@@ -701,7 +797,7 @@ const SportsNotePlatform = () => {
       year: note.year,
       championship: note.championship,
       team: note.noteType === 'confronto' ? '' : (note.team || ''),
-      player: note.noteType === 'confronto' ? '' : note.player,
+      player: note.noteType === 'confronto' ? '' : (note.player || ''),
       confrontoTeam1: note.noteType === 'confronto' ? (confrontoTeams[0] || '') : '',
       confrontoTeam2: note.noteType === 'confronto' ? (confrontoTeams[1] || '') : '',
       content: note.content,
@@ -791,7 +887,7 @@ const SportsNotePlatform = () => {
       reminders,
       sports,
       exportDate: new Date().toISOString(),
-      version: '1.2'
+      version: '1.3'
     };
     
     const blob = new Blob([JSON.stringify(dataToExport, null, 2)], { 
@@ -906,7 +1002,10 @@ const SportsNotePlatform = () => {
       favorites: notes.filter(n => n.favorite).length,
       winningBets: statistics.filter(s => s.result === 'win').length,
       losingBets: statistics.filter(s => s.result === 'loss').length,
-      confrontoNotes: notes.filter(n => n.noteType === 'confronto').length
+      confrontoNotes: notes.filter(n => n.noteType === 'confronto').length,
+      timeNotes: notes.filter(n => n.noteType === 'time').length,
+      campeonatoNotes: notes.filter(n => n.noteType === 'campeonato').length,
+      individualNotes: notes.filter(n => n.noteType === 'individual').length
     };
     
     sports.forEach(sport => {
@@ -929,6 +1028,28 @@ const SportsNotePlatform = () => {
       case 'stats': return filteredStatistics;
       case 'reminders': return filteredReminders;
       default: return filteredNotes;
+    }
+  };
+
+  // Função para obter ícone do tipo de nota
+  const getNoteTypeIcon = (noteType) => {
+    switch (noteType) {
+      case 'individual': return <User className="h-4 w-4" />;
+      case 'time': return <Building className="h-4 w-4" />;
+      case 'campeonato': return <Globe className="h-4 w-4" />;
+      case 'confronto': return <Users className="h-4 w-4" />;
+      default: return <User className="h-4 w-4" />;
+    }
+  };
+
+  // Função para obter nome do tipo de nota
+  const getNoteTypeName = (noteType) => {
+    switch (noteType) {
+      case 'individual': return 'Individual';
+      case 'time': return 'Time';
+      case 'campeonato': return 'Campeonato';
+      case 'confronto': return 'Confronto';
+      default: return 'Individual';
     }
   };
 
@@ -1064,7 +1185,7 @@ const SportsNotePlatform = () => {
 
             {/* Stats específicos por view */}
             {currentView === 'notes' && (
-              <div className="grid grid-cols-auto gap-4" style={{gridTemplateColumns: `repeat(${Math.min(sports.length + 3, 6)}, minmax(0, 1fr))`}}>
+              <div className="grid grid-cols-auto gap-4" style={{gridTemplateColumns: `repeat(${Math.min(sports.length + 6, 8)}, minmax(0, 1fr))`}}>
                 <button
                   onClick={() => applyQuickFilter('all', 'todos')}
                   className="bg-blue-50 p-4 rounded-lg hover:bg-blue-100 transition-colors text-left"
@@ -1079,6 +1200,18 @@ const SportsNotePlatform = () => {
                   <div className="text-2xl font-bold text-yellow-600">{stats.favorites}</div>
                   <div className="text-sm text-yellow-800">Favoritas</div>
                 </button>
+                <div className="bg-emerald-50 p-4 rounded-lg">
+                  <div className="text-2xl font-bold text-emerald-600">{stats.individualNotes}</div>
+                  <div className="text-sm text-emerald-800">Individual</div>
+                </div>
+                <div className="bg-amber-50 p-4 rounded-lg">
+                  <div className="text-2xl font-bold text-amber-600">{stats.timeNotes}</div>
+                  <div className="text-sm text-amber-800">Times</div>
+                </div>
+                <div className="bg-sky-50 p-4 rounded-lg">
+                  <div className="text-2xl font-bold text-sky-600">{stats.campeonatoNotes}</div>
+                  <div className="text-sm text-sky-800">Campeonatos</div>
+                </div>
                 <button
                   onClick={() => applyQuickFilter('noteType', 'confronto')}
                   className="bg-purple-50 p-4 rounded-lg hover:bg-purple-100 transition-colors text-left"
@@ -1452,8 +1585,11 @@ const SportsNotePlatform = () => {
                         <div className="flex-1">
                           <div className="flex items-center gap-2 mb-1">
                             <span className="text-sm font-medium">
-                              {note.sport} - {note.year} - {note.championship} - {note.player}
+                              {note.sport} - {note.year} - {note.championship}
                               {note.noteType === 'confronto' && ' (Confronto)'}
+                              {note.noteType === 'time' && ' (Time)'}
+                              {note.noteType === 'campeonato' && ' (Campeonato)'}
+                              {note.noteType === 'individual' && note.player && ` - ${note.player}`}
                             </span>
                           </div>
                           <p className={`text-sm ${config.theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>
@@ -1553,7 +1689,7 @@ const SportsNotePlatform = () => {
 
                 <div className="mb-4">
                   <label className="block text-sm font-medium mb-1">Tipo de Nota</label>
-                  <div className="flex gap-4">
+                  <div className="grid grid-cols-2 gap-4">
                     <label className="flex items-center gap-2">
                       <input
                         type="radio"
@@ -1561,7 +1697,28 @@ const SportsNotePlatform = () => {
                         checked={newNote.noteType === 'individual'}
                         onChange={(e) => setNewNote({...newNote, noteType: e.target.value})}
                       />
+                      <User className="h-4 w-4" />
                       <span>Individual</span>
+                    </label>
+                    <label className="flex items-center gap-2">
+                      <input
+                        type="radio"
+                        value="time"
+                        checked={newNote.noteType === 'time'}
+                        onChange={(e) => setNewNote({...newNote, noteType: e.target.value})}
+                      />
+                      <Building className="h-4 w-4" />
+                      <span>Time</span>
+                    </label>
+                    <label className="flex items-center gap-2">
+                      <input
+                        type="radio"
+                        value="campeonato"
+                        checked={newNote.noteType === 'campeonato'}
+                        onChange={(e) => setNewNote({...newNote, noteType: e.target.value})}
+                      />
+                      <Globe className="h-4 w-4" />
+                      <span>Campeonato</span>
                     </label>
                     <label className="flex items-center gap-2">
                       <input
@@ -1570,18 +1727,17 @@ const SportsNotePlatform = () => {
                         checked={newNote.noteType === 'confronto'}
                         onChange={(e) => setNewNote({...newNote, noteType: e.target.value})}
                       />
+                      <Users className="h-4 w-4" />
                       <span>Confronto</span>
-                      <HelpCircle 
-                        className="h-4 w-4 text-gray-400" 
-                        title="Para confrontos, a nota ficará disponível para ambos os times/jogadores"
-                      />
                     </label>
                   </div>
                 </div>
 
                 <div className="grid grid-cols-2 gap-4 mb-4">
                   <div>
-                    <label className="block text-sm font-medium mb-1">Campeonato</label>
+                    <label className="block text-sm font-medium mb-1">
+                      Campeonato {newNote.noteType === 'campeonato' && '*'}
+                    </label>
                     <input
                       type="text"
                       className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 ${
@@ -1595,9 +1751,12 @@ const SportsNotePlatform = () => {
                     />
                   </div>
 
-                  {newNote.noteType === 'individual' && newNote.sport === 'futebol' && (
+                  {/* Campo Time - aparece para individual (futebol) e time */}
+                  {((newNote.noteType === 'individual' && newNote.sport === 'futebol') || newNote.noteType === 'time') && (
                     <div>
-                      <label className="block text-sm font-medium mb-1">Time</label>
+                      <label className="block text-sm font-medium mb-1">
+                        Time {newNote.noteType === 'time' && '*'}
+                      </label>
                       <input
                         type="text"
                         className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 ${
@@ -1612,11 +1771,12 @@ const SportsNotePlatform = () => {
                     </div>
                   )}
 
+                  {/* Campos para confronto */}
                   {newNote.noteType === 'confronto' && (
                     <>
                       <div>
                         <label className="block text-sm font-medium mb-1">
-                          {newNote.sport === 'futebol' ? 'Time 1' : 'Jogador 1'}
+                          {newNote.sport === 'futebol' ? 'Time 1 *' : 'Jogador 1 *'}
                         </label>
                         <input
                           type="text"
@@ -1632,7 +1792,7 @@ const SportsNotePlatform = () => {
                       </div>
                       <div>
                         <label className="block text-sm font-medium mb-1">
-                          {newNote.sport === 'futebol' ? 'Time 2' : 'Jogador 2'}
+                          {newNote.sport === 'futebol' ? 'Time 2 *' : 'Jogador 2 *'}
                         </label>
                         <input
                           type="text"
@@ -1650,8 +1810,9 @@ const SportsNotePlatform = () => {
                   )}
                 </div>
 
-                <div className="grid grid-cols-2 gap-4 mb-4">
-                  {newNote.noteType === 'individual' && (
+                {/* Campo jogador - apenas para individual */}
+                {newNote.noteType === 'individual' && (
+                  <div className="grid grid-cols-2 gap-4 mb-4">
                     <div>
                       <label className="block text-sm font-medium mb-1">Jogador *</label>
                       <input
@@ -1667,10 +1828,25 @@ const SportsNotePlatform = () => {
                         required
                       />
                     </div>
-                  )}
 
-                  <div>
-                    <label className="flex items-center gap-2 mt-6">
+                    <div>
+                      <label className="flex items-center gap-2 mt-6">
+                        <input
+                          type="checkbox"
+                          checked={newNote.favorite}
+                          onChange={(e) => setNewNote({...newNote, favorite: e.target.checked})}
+                          className="rounded"
+                        />
+                        <Star className="h-4 w-4" />
+                        <span>Marcar como favorita</span>
+                      </label>
+                    </div>
+                  </div>
+                )}
+
+                {newNote.noteType !== 'individual' && (
+                  <div className="mb-4">
+                    <label className="flex items-center gap-2">
                       <input
                         type="checkbox"
                         checked={newNote.favorite}
@@ -1681,7 +1857,7 @@ const SportsNotePlatform = () => {
                       <span>Marcar como favorita</span>
                     </label>
                   </div>
-                </div>
+                )}
 
                 {/* Sistema de Tags */}
                 <div className="mb-4">
@@ -2093,29 +2269,52 @@ const SportsNotePlatform = () => {
                           <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getSportColor(note.sport)}`}>
                             {note.sport.charAt(0).toUpperCase() + note.sport.slice(1)}
                           </span>
-                          <span className={`text-sm flex items-center gap-1 ${config.theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>
-                            <Calendar className="h-4 w-4" />
-                            {note.year}
-                          </span>
-                          <span className={`text-sm flex items-center gap-1 ${config.theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>
-                            <Trophy className="h-4 w-4" />
-                            {note.championship}
-                          </span>
-                          {note.noteType === 'individual' && note.team && (
+                          
+                          {note.year && (
+                            <span className={`text-sm flex items-center gap-1 ${config.theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>
+                              <Calendar className="h-4 w-4" />
+                              {note.year}
+                            </span>
+                          )}
+                          
+                          {note.championship && (
+                            <span className={`text-sm flex items-center gap-1 ${config.theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>
+                              <Trophy className="h-4 w-4" />
+                              {note.championship}
+                            </span>
+                          )}
+                          
+                          {note.team && note.noteType !== 'confronto' && (
+                            <span className={`text-sm flex items-center gap-1 ${config.theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>
+                              <Building className="h-4 w-4" />
+                              {note.team}
+                            </span>
+                          )}
+                          
+                          {note.player && note.noteType === 'individual' && (
+                            <span className={`text-sm flex items-center gap-1 ${config.theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>
+                              <User className="h-4 w-4" />
+                              {note.player}
+                            </span>
+                          )}
+                          
+                          {note.noteType === 'confronto' && (
                             <span className={`text-sm flex items-center gap-1 ${config.theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>
                               <Users className="h-4 w-4" />
                               {note.team}
                             </span>
                           )}
-                          <span className={`text-sm flex items-center gap-1 ${config.theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>
-                            <User className="h-4 w-4" />
-                            {note.noteType === 'confronto' ? note.team : note.player}
+                          
+                          {/* Badge do tipo de nota */}
+                          <span className={`px-2 py-1 rounded text-xs font-medium flex items-center gap-1 ${
+                            note.noteType === 'individual' ? 'bg-blue-100 text-blue-800' :
+                            note.noteType === 'time' ? 'bg-amber-100 text-amber-800' :
+                            note.noteType === 'campeonato' ? 'bg-sky-100 text-sky-800' :
+                            'bg-purple-100 text-purple-800'
+                          }`}>
+                            {getNoteTypeIcon(note.noteType)}
+                            {getNoteTypeName(note.noteType)}
                           </span>
-                          {note.noteType === 'confronto' && (
-                            <span className="px-2 py-1 bg-purple-100 text-purple-800 rounded text-xs font-medium">
-                              Confronto
-                            </span>
-                          )}
                         </div>
 
                         {/* Tags */}
