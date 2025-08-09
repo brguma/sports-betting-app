@@ -1,70 +1,90 @@
-# Getting Started with Create React App
+# 🏆 Plataforma de Apostas Esportivas
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+Uma Progressive Web App (PWA) completa para gerenciar anotações, estatísticas e lembretes de apostas esportivas de forma profissional.
 
-## Available Scripts
+## ✨ Funcionalidades
 
-In the project directory, you can run:
+- 📝 **Anotações Inteligentes**: Gerencie notas individuais e confrontos
+- 📊 **Estatísticas**: Acompanhe odds, resultados e performance
+- ⏰ **Lembretes**: Organize suas análises e jogos importantes
+- 🏷️ **Sistema de Tags**: Categorize e filtre suas anotações
+- ⭐ **Favoritos**: Marque anotações importantes
+- 🌙 **Modo Escuro**: Interface adaptável
+- 💾 **Backup Automático**: Dados seguros no navegador
+- 📱 **PWA**: Instalável como app nativo
+- 🔄 **Offline**: Funciona sem internet após instalação
 
-### `npm start`
+## 🚀 Tecnologias
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+- React 18
+- Tailwind CSS
+- Lucide React (ícones)
+- Service Workers (PWA)
+- LocalStorage (persistência)
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+## 📱 Instalação como App
 
-### `npm test`
+1. Acesse o site no Chrome/Edge
+2. Clique no ícone de instalação na barra de endereços
+3. Ou use o botão "Instalar App" que aparece
+4. O app será instalado como um programa normal!
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+## 🛠️ Desenvolvimento Local
 
-### `npm run build`
+```bash
+# Instalar dependências
+npm install
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+# Executar em modo desenvolvimento
+npm start
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+# Construir para produção
+npm run build
+```
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+## 🌐 Deploy
 
-### `npm run eject`
+Este projeto está configurado para deploy automático no Vercel via GitHub.
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+## 📋 Como Usar
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+### Anotações
+- Crie notas individuais para jogadores específicos
+- Ou crie confrontos entre times/jogadores
+- Use tags para categorizar (#casa, #gols, #resistência)
+- Marque favoritos com ⭐
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+### Estatísticas
+- Registre suas apostas com odds
+- Acompanhe resultados (ganhou/perdeu)
+- Analise performance por esporte
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+### Lembretes
+- Organize análises futuras
+- Defina horários para jogos importantes
+- Categorize por tipo (análise/jogo/revisão)
 
-## Learn More
+## 🎯 Roadmap
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+- [ ] Gráficos de performance
+- [ ] Exportação para Excel
+- [ ] Sincronização em nuvem
+- [ ] Notificações push
+- [ ] Calculadora de odds
+- [ ] API de odds em tempo real
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+## 🤝 Contribuição
 
-### Code Splitting
+1. Fork o projeto
+2. Crie uma branch para sua feature
+3. Commit suas mudanças
+4. Push para a branch
+5. Abra um Pull Request
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+## 📄 Licença
 
-### Analyzing the Bundle Size
+Este projeto é de uso pessoal e educacional.
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
+---
 
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+Desenvolvido com ❤️ para apostadores profissionais
