@@ -1,0 +1,387 @@
+{
+  "notes": [
+    {
+      "id": 1755048021013,
+      "sport": "futebol",
+      "newSport": "",
+      "year": "2025",
+      "championship": "TORNEIOS ELIMINATÓRIOS",
+      "team": "",
+      "player": "",
+      "confrontoTeam1": "",
+      "confrontoTeam2": "",
+      "content": "Eliminatorios\no time jogou 2x em casa no mesmo campeonato, entao nesse campeonato se tiver o over 4,5 acima de 1,90\nentra no 3 jogo, se o time passar de fase, entra em todos os jogos",
+      "tags": [
+        "Escanteios",
+        "Eliminatorio"
+      ],
+      "favorite": false,
+      "noteType": "campeonato",
+      "date": "2025-08-13",
+      "confrontoTeams": []
+    },
+    {
+      "id": 1754829304853,
+      "sport": "tenis",
+      "newSport": "",
+      "year": "2025",
+      "championship": "ATP Cincinnati",
+      "team": "João Fonseca vs Davidovich Fokina",
+      "player": "Confronto",
+      "confrontoTeam1": "João Fonseca",
+      "confrontoTeam2": "Davidovich Fokina",
+      "content": "Apos ganhar o 1 set no tiebreak, no segundo set e ganhando de 4-0 e sacando para o 5-0, Fokina sentiu algum mal estar, tomou a virada e no 4-5 abandonou o jogo",
+      "tags": [
+        "Lesão"
+      ],
+      "favorite": false,
+      "noteType": "confronto",
+      "date": "2025-08-10",
+      "confrontoTeams": [
+        "João Fonseca",
+        "Davidovich Fokina"
+      ]
+    },
+    {
+      "sport": "futebol",
+      "newSport": "",
+      "year": "2025",
+      "championship": "ALEMANHA - BUDES 2",
+      "team": "",
+      "player": "",
+      "confrontoTeam1": "",
+      "confrontoTeam2": "",
+      "content": "OVER 2,25 ODD MINIMA 1,70 a 1,90 \nOVER 1,75 ODD MINIMA 1,70 a 1,90",
+      "tags": [
+        "BUDES2",
+        "OVERGOLS"
+      ],
+      "favorite": false,
+      "noteType": "campeonato",
+      "date": "2025-08-09",
+      "id": 1754703367442,
+      "confrontoTeams": []
+    },
+    {
+      "id": 1754704177186,
+      "sport": "futebol",
+      "newSport": "",
+      "year": "2025",
+      "championship": "Futebol feminino",
+      "team": "",
+      "player": "",
+      "confrontoTeam1": "",
+      "confrontoTeam2": "",
+      "content": "Gols escadinha\nover 2 pré\nsaiu gol pega a linha oferecida",
+      "tags": [
+        "feminino",
+        "overgols"
+      ],
+      "favorite": false,
+      "noteType": "campeonato",
+      "date": "2025-08-09",
+      "confrontoTeams": []
+    },
+    {
+      "sport": "futebol",
+      "newSport": "",
+      "year": "2025",
+      "championship": "Futebol Mundial",
+      "team": "",
+      "player": "",
+      "confrontoTeam1": "",
+      "confrontoTeam2": "",
+      "content": "Todos os campeonatos do mundo\na maioria dos gols no 2 tempo é apos o minuto 74\npegar over acima e o over 2 linhas acima",
+      "tags": [
+        "Futebol",
+        "Todos"
+      ],
+      "favorite": false,
+      "noteType": "campeonato",
+      "date": "2025-08-09",
+      "id": 1754704282426,
+      "confrontoTeams": []
+    },
+    {
+      "id": 1754704334579,
+      "sport": "futebol",
+      "newSport": "",
+      "year": "2025",
+      "championship": "Brasileiro A",
+      "team": "",
+      "player": "",
+      "confrontoTeam1": "",
+      "confrontoTeam2": "",
+      "content": "Dupla\nescanteios antes dos 10 min",
+      "tags": [
+        "Escanteios",
+        "cantos10min"
+      ],
+      "favorite": false,
+      "noteType": "campeonato",
+      "date": "2025-08-09",
+      "confrontoTeams": []
+    },
+    {
+      "sport": "tenis",
+      "newSport": "",
+      "year": "2025",
+      "championship": "",
+      "team": "",
+      "player": "Aoi Ito",
+      "confrontoTeam1": "",
+      "confrontoTeam2": "",
+      "content": "Paciencia;\nBaixa potencia;\nsó devolve a bola;\ndepende do erro da outra jogadora;",
+      "tags": [
+        "Paciencia"
+      ],
+      "favorite": false,
+      "noteType": "individual",
+      "date": "2025-08-09",
+      "id": 1754751872613,
+      "confrontoTeams": []
+    },
+    {
+      "sport": "tenis",
+      "newSport": "",
+      "year": "",
+      "championship": "",
+      "team": "",
+      "player": "BIA HADDAD",
+      "confrontoTeam1": "",
+      "confrontoTeam2": "",
+      "content": "Mental ruim;\nagressiva;\ninconstante;",
+      "tags": [
+        "Mental"
+      ],
+      "favorite": false,
+      "noteType": "individual",
+      "date": "2025-08-09",
+      "id": 1754763212843,
+      "confrontoTeams": []
+    },
+    {
+      "id": 1754774816738,
+      "sport": "tenis",
+      "newSport": "",
+      "year": "2025",
+      "championship": "WTA - CINCINNATI",
+      "team": "MAYA JOINT vs BIA HADDAD",
+      "player": "Confronto",
+      "confrontoTeam1": "MAYA JOINT",
+      "confrontoTeam2": "BIA HADDAD",
+      "content": "Bia sentiu desconforto no 3 set, não conseguia pular pra sacar",
+      "tags": [
+        "Bia",
+        "Lesão"
+      ],
+      "favorite": false,
+      "noteType": "confronto",
+      "date": "2025-08-09",
+      "confrontoTeams": [
+        "MAYA JOINT",
+        "BIA HADDAD"
+      ]
+    },
+    {
+      "id": 1754763176787,
+      "sport": "tenis",
+      "newSport": "",
+      "year": "2025",
+      "championship": "",
+      "team": "",
+      "player": "Jessica Bouzas Maneiro",
+      "confrontoTeam1": "",
+      "confrontoTeam2": "",
+      "content": "Agressiva;\nSempre vai pra linha e pro limite;",
+      "tags": [
+        "Agressividade"
+      ],
+      "favorite": false,
+      "noteType": "individual",
+      "date": "2025-08-09",
+      "confrontoTeams": []
+    },
+    {
+      "id": 1754770682699,
+      "sport": "tenis",
+      "newSport": "",
+      "year": "2025",
+      "championship": "",
+      "team": "",
+      "player": "Keys",
+      "confrontoTeam1": "",
+      "confrontoTeam2": "",
+      "content": "Inconstante;\n",
+      "tags": [
+        "Inconstante"
+      ],
+      "favorite": false,
+      "noteType": "individual",
+      "date": "2025-08-09",
+      "confrontoTeams": []
+    },
+    {
+      "id": 1754763122339,
+      "sport": "tenis",
+      "newSport": "",
+      "year": "2025",
+      "championship": "",
+      "team": "",
+      "player": "Leyla Fernandez",
+      "confrontoTeam1": "",
+      "confrontoTeam2": "",
+      "content": "Tem problema com dupla faltas;\nquando começa a errar não para;",
+      "tags": [
+        "Mental"
+      ],
+      "favorite": false,
+      "noteType": "individual",
+      "date": "2025-08-09",
+      "confrontoTeams": []
+    },
+    {
+      "sport": "tenis",
+      "newSport": "",
+      "year": "2025",
+      "championship": "",
+      "team": "",
+      "player": "Pavlyuchenkova",
+      "confrontoTeam1": "",
+      "confrontoTeam2": "",
+      "content": "Estressada;\nPotencia;\nMental ruim;",
+      "tags": [
+        "agressiva",
+        "potencia"
+      ],
+      "favorite": false,
+      "noteType": "individual",
+      "date": "2025-08-09",
+      "id": 1754751837956,
+      "confrontoTeams": []
+    },
+    {
+      "id": 1754771616442,
+      "sport": "tenis",
+      "newSport": "",
+      "year": "",
+      "championship": "",
+      "team": "",
+      "player": "Shnaider",
+      "confrontoTeam1": "",
+      "confrontoTeam2": "",
+      "content": "Potencia;\nMuitos erros não forçados e dados;",
+      "tags": [],
+      "favorite": false,
+      "noteType": "individual",
+      "date": "2025-08-09",
+      "confrontoTeams": []
+    },
+    {
+      "id": 1754771578154,
+      "sport": "tenis",
+      "newSport": "",
+      "year": "2025",
+      "championship": "",
+      "team": "",
+      "player": "Yue Yuan",
+      "confrontoTeam1": "",
+      "confrontoTeam2": "",
+      "content": "Potencia;\nAgressividade",
+      "tags": [
+        "Agressividade"
+      ],
+      "favorite": false,
+      "noteType": "individual",
+      "date": "2025-08-09",
+      "confrontoTeams": []
+    }
+  ],
+  "statistics": [
+    {
+      "id": 1754704473883,
+      "sport": "futebol",
+      "newSport": "",
+      "championship": "Budes2",
+      "team": "Nuremberg X Darmstadt",
+      "date": "2025-08-08",
+      "situation": "07:54 - Over 2,25",
+      "odd": 1.7,
+      "observation": "",
+      "result": null
+    },
+    {
+      "id": 1754704514027,
+      "sport": "futebol",
+      "newSport": "",
+      "championship": "Budes2",
+      "team": "Nuremberg x Darmstadt",
+      "date": "2025-08-08",
+      "situation": "27:23 - over 1,75",
+      "odd": 1.7,
+      "observation": "",
+      "result": null
+    },
+    {
+      "id": 1754704551411,
+      "sport": "futebol",
+      "newSport": "",
+      "championship": "Budes 2",
+      "team": "Preussen x Paderborn",
+      "date": "2025-08-08",
+      "situation": "05:00 - 2,25",
+      "odd": 1.78,
+      "observation": "",
+      "result": null
+    },
+    {
+      "id": 1754704589443,
+      "sport": "futebol",
+      "newSport": "",
+      "championship": "Budes 2",
+      "team": "Preusson x Paderborn",
+      "date": "2025-08-08",
+      "situation": "20:51 - over 1,75",
+      "odd": 1.7,
+      "observation": "",
+      "result": null
+    },
+    {
+      "id": 1754704653354,
+      "sport": "futebol",
+      "newSport": "",
+      "championship": "Budes 3",
+      "team": "Schweinfurt x Cottbus",
+      "date": "2025-08-08",
+      "situation": "11:43 - over 2,25",
+      "odd": 1.7,
+      "observation": "",
+      "result": null
+    },
+    {
+      "id": 1754704678634,
+      "sport": "futebol",
+      "newSport": "",
+      "championship": "Budes 2",
+      "team": "Schweinfurt x Cottbus",
+      "date": "2025-08-08",
+      "situation": "28:35 - Over 1,75",
+      "odd": 1.7,
+      "observation": "",
+      "result": null
+    }
+  ],
+  "reminders": [],
+  "sports": [
+    {
+      "name": "futebol",
+      "color": "bg-green-100 text-green-800"
+    },
+    {
+      "name": "tenis",
+      "color": "bg-orange-100 text-orange-800"
+    }
+  ],
+  "exportDate": "2025-08-13T01:20:47.453Z",
+  "version": "1.3"
+}
