@@ -253,7 +253,7 @@ const CompleteSportsPlatform = () => {
     mercado: '',
     unidades: 1,
     resultadoJogo: '',
-    valor: config.valorUnidade,
+    valor: config.valorUnidade || 100,
     odds: '',
     resultado: '',
     lucroReais: 0,
@@ -983,7 +983,7 @@ const CompleteSportsPlatform = () => {
       id: Date.now(),
       ...newStat,
       sport: finalSport,
-      odd: parseFloat(newStat.odd),
+      odd: parseFloat(newStat.odd) || 0,
       date: newStat.date || new Date().toISOString().split('T')[0]
     };
 
@@ -1115,7 +1115,7 @@ const CompleteSportsPlatform = () => {
 
     const updatedStats = statistics.map(stat => 
       stat.id === editingStat.id 
-        ? { ...newStat, id: editingStat.id, sport: finalSport, odd: parseFloat(newStat.odd) }
+        ? { ...newStat, id: editingStat.id, sport: finalSport, odd: parseFloat(newStat.odd) || 0 }
         : stat
     );
 
@@ -1232,7 +1232,7 @@ const CompleteSportsPlatform = () => {
       team: stat.team,
       date: stat.date,
       situation: stat.situation,
-      odd: stat.odd.toString(),
+      odd: (stat.odd || 0).toString(),
       observation: stat.observation,
       result: stat.result
     });
@@ -1304,12 +1304,12 @@ const CompleteSportsPlatform = () => {
     // Determinar qual valor de unidade usar
     const activeComp = getActiveComprovacao();
     const valorUnidadeAtual = currentView === 'comprovacoes' && activeComprovacao && activeComp
-      ? activeComp.valorUnidade
-      : config.valorUnidade;
+      ? (activeComp.valorUnidade || 100)
+      : (config.valorUnidade || 100);
 
     const { lucroReais, lucroUnidades } = calculateProfit(
-      parseFloat(newBanca.unidades),
-      parseFloat(newBanca.odds),
+      parseFloat(newBanca.unidades) || 0,
+      parseFloat(newBanca.odds) || 0,
       newBanca.resultado,
       valorUnidadeAtual
     );
@@ -1317,9 +1317,9 @@ const CompleteSportsPlatform = () => {
     const banca = {
       id: Date.now(),
       ...newBanca,
-      unidades: parseFloat(newBanca.unidades),
-      valor: parseFloat(newBanca.unidades) * valorUnidadeAtual,
-      odds: parseFloat(newBanca.odds),
+      unidades: parseFloat(newBanca.unidades) || 0,
+      valor: (parseFloat(newBanca.unidades) || 0) * valorUnidadeAtual,
+      odds: parseFloat(newBanca.odds) || 0,
       lucroReais,
       lucroUnidades
     };
@@ -1344,12 +1344,12 @@ const CompleteSportsPlatform = () => {
     // Determinar qual valor de unidade usar
     const activeComp = getActiveComprovacao();
     const valorUnidadeAtual = currentView === 'comprovacoes' && activeComprovacao && activeComp
-      ? activeComp.valorUnidade
-      : config.valorUnidade;
+      ? (activeComp.valorUnidade || 100)
+      : (config.valorUnidade || 100);
 
     const { lucroReais, lucroUnidades } = calculateProfit(
-      parseFloat(newBanca.unidades),
-      parseFloat(newBanca.odds),
+      parseFloat(newBanca.unidades) || 0,
+      parseFloat(newBanca.odds) || 0,
       newBanca.resultado,
       valorUnidadeAtual
     );
@@ -1357,9 +1357,9 @@ const CompleteSportsPlatform = () => {
     const updatedEntry = {
       ...newBanca,
       id: editingBanca.id,
-      unidades: parseFloat(newBanca.unidades),
-      valor: parseFloat(newBanca.unidades) * valorUnidadeAtual,
-      odds: parseFloat(newBanca.odds),
+      unidades: parseFloat(newBanca.unidades) || 0,
+      valor: (parseFloat(newBanca.unidades) || 0) * valorUnidadeAtual,
+      odds: parseFloat(newBanca.odds) || 0,
       lucroReais,
       lucroUnidades
     };
@@ -1409,17 +1409,17 @@ const CompleteSportsPlatform = () => {
       unidades: entry.unidades,
       resultadoJogo: entry.resultadoJogo,
       valor: entry.valor,
-      odds: entry.odds.toString(),
+      odds: (entry.odds || 0).toString(),
       resultado: entry.resultado,
-      lucroReais: entry.lucroReais,
-      lucroUnidades: entry.lucroUnidades
+      lucroReais: entry.lucroReais || 0,
+      lucroUnidades: entry.lucroUnidades || 0
     });
     setEditingBanca(entry);
   };
 
   const resetBancaForm = () => {
     const activeComp = currentView === 'comprovacoes' && activeComprovacao ? getActiveComprovacao() : null;
-    const valorUnidadeAtual = activeComp ? activeComp.valorUnidade : config.valorUnidade;
+    const valorUnidadeAtual = activeComp ? (activeComp.valorUnidade || 100) : (config.valorUnidade || 100);
 
     setNewBanca({
       date: new Date().toISOString().split('T')[0],
@@ -1705,7 +1705,7 @@ const CompleteSportsPlatform = () => {
                           Lucro/Prejuízo (Unidades)
                         </p>
                         <p className={`text-3xl font-bold ${getBancaStats.totalLucroUnidades >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-                          {getBancaStats.totalLucroUnidades >= 0 ? '+' : ''}{getBancaStats.totalLucroUnidades.toFixed(2)}u
+                          {getBancaStats.totalLucroUnidades >= 0 ? '+' : ''}{(getBancaStats.totalLucroUnidades || 0).toFixed(2)}u
                         </p>
                       </div>
                       {getBancaStats.totalLucroUnidades >= 0 ? (
@@ -1737,7 +1737,7 @@ const CompleteSportsPlatform = () => {
                           Lucro/Prejuízo (R$)
                         </p>
                         <p className={`text-3xl font-bold ${getBancaStats.totalLucroReais >= 0 ? 'text-emerald-600' : 'text-pink-600'}`}>
-                          R$ {getBancaStats.totalLucroReais >= 0 ? '+' : ''}{getBancaStats.totalLucroReais.toFixed(2)}
+                          R$ {getBancaStats.totalLucroReais >= 0 ? '+' : ''}{(getBancaStats.totalLucroReais || 0).toFixed(2)}
                         </p>
                       </div>
                       <DollarSign className="h-8 w-8 text-emerald-600" />
@@ -1822,7 +1822,7 @@ const CompleteSportsPlatform = () => {
                             : 'border-gray-300'
                         }`}
                       >
-                        R$ {config.valorUnidade.toFixed(2)}
+                        R$ {(config.valorUnidade || 100).toFixed(2)}
                         <Edit2 className="h-3 w-3" />
                       </button>
                     )}
@@ -1885,7 +1885,7 @@ const CompleteSportsPlatform = () => {
                               Lucro/Prejuízo (Unidades)
                             </p>
                             <p className={`text-3xl font-bold ${getComprovacaoStats(getActiveComprovacao(), bancaMonth).totalLucroUnidades >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-                              {getComprovacaoStats(getActiveComprovacao(), bancaMonth).totalLucroUnidades >= 0 ? '+' : ''}{getComprovacaoStats(getActiveComprovacao(), bancaMonth).totalLucroUnidades.toFixed(2)}u
+                              {getComprovacaoStats(getActiveComprovacao(), bancaMonth).totalLucroUnidades >= 0 ? '+' : ''}{(getComprovacaoStats(getActiveComprovacao(), bancaMonth).totalLucroUnidades || 0).toFixed(2)}u
                             </p>
                           </div>
                           {getComprovacaoStats(getActiveComprovacao(), bancaMonth).totalLucroUnidades >= 0 ? (
@@ -1917,7 +1917,7 @@ const CompleteSportsPlatform = () => {
                               Lucro/Prejuízo (R$)
                             </p>
                             <p className={`text-3xl font-bold ${getComprovacaoStats(getActiveComprovacao(), bancaMonth).totalLucroReais >= 0 ? 'text-emerald-600' : 'text-pink-600'}`}>
-                              R$ {getComprovacaoStats(getActiveComprovacao(), bancaMonth).totalLucroReais >= 0 ? '+' : ''}{getComprovacaoStats(getActiveComprovacao(), bancaMonth).totalLucroReais.toFixed(2)}
+                              R$ {getComprovacaoStats(getActiveComprovacao(), bancaMonth).totalLucroReais >= 0 ? '+' : ''}{(getComprovacaoStats(getActiveComprovacao(), bancaMonth).totalLucroReais || 0).toFixed(2)}
                             </p>
                           </div>
                           <DollarSign className="h-8 w-8 text-emerald-600" />
@@ -2008,7 +2008,7 @@ const CompleteSportsPlatform = () => {
                                 : 'border-gray-300'
                             }`}
                           >
-                            R$ {getActiveComprovacao() ? getActiveComprovacao().valorUnidade.toFixed(2) : '0.00'}
+                            R$ {getActiveComprovacao() ? (getActiveComprovacao().valorUnidade || 100).toFixed(2) : '100.00'}
                             <Edit2 className="h-3 w-3" />
                           </button>
                         )}
@@ -3210,7 +3210,7 @@ const CompleteSportsPlatform = () => {
                 {currentView === 'comprovacoes' && activeComprovacao && getActiveComprovacao() && (
                   <div className="mb-4 p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
                     <p className="text-sm text-blue-800 dark:text-blue-200">
-                      Valor da unidade para esta comprovação: <strong>R$ {getActiveComprovacao().valorUnidade.toFixed(2)}</strong>
+                      Valor da unidade para esta comprovação: <strong>R$ {(getActiveComprovacao().valorUnidade || 100).toFixed(2)}</strong>
                     </p>
                   </div>
                 )}
@@ -3310,8 +3310,8 @@ const CompleteSportsPlatform = () => {
                         const unidades = parseFloat(e.target.value) || 0;
                         const activeComp = getActiveComprovacao();
                         const valorUnidadeAtual = currentView === 'comprovacoes' && activeComprovacao && activeComp
-                          ? activeComp.valorUnidade
-                          : config.valorUnidade;
+                          ? (activeComp.valorUnidade || 100)
+                          : (config.valorUnidade || 100);
                         const valor = unidades * valorUnidadeAtual;
                         setNewBanca({...newBanca, unidades, valor});
                       }}
@@ -3365,11 +3365,11 @@ const CompleteSportsPlatform = () => {
                         const resultado = e.target.value;
                         const activeComp = getActiveComprovacao();
                         const valorUnidadeAtual = currentView === 'comprovacoes' && activeComprovacao && activeComp
-                          ? activeComp.valorUnidade
-                          : config.valorUnidade;
+                          ? (activeComp.valorUnidade || 100)
+                          : (config.valorUnidade || 100);
                         const { lucroReais, lucroUnidades } = calculateProfit(
-                          parseFloat(newBanca.unidades),
-                          parseFloat(newBanca.odds),
+                          parseFloat(newBanca.unidades) || 0,
+                          parseFloat(newBanca.odds) || 0,
                           resultado,
                           valorUnidadeAtual
                         );
@@ -3394,7 +3394,7 @@ const CompleteSportsPlatform = () => {
                           ? 'bg-gray-600 text-gray-300' 
                           : 'bg-gray-100 text-gray-600'
                       }`}
-                      value={`R$ ${(newBanca.unidades * (currentView === 'comprovacoes' && activeComprovacao && getActiveComprovacao() ? getActiveComprovacao().valorUnidade : config.valorUnidade)).toFixed(2)}`}
+                      value={`R$ ${((newBanca.unidades || 0) * (currentView === 'comprovacoes' && activeComprovacao && getActiveComprovacao() ? (getActiveComprovacao().valorUnidade || 100) : (config.valorUnidade || 100))).toFixed(2)}`}
                       disabled
                     />
                   </div>
@@ -3405,13 +3405,13 @@ const CompleteSportsPlatform = () => {
                     <div>
                       <label className="block text-sm font-medium mb-1">Lucro/Prejuízo (R$)</label>
                       <div className={`text-2xl font-bold ${newBanca.lucroReais >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-                        R$ {newBanca.lucroReais >= 0 ? '+' : ''}{newBanca.lucroReais.toFixed(2)}
+                        R$ {newBanca.lucroReais >= 0 ? '+' : ''}{(newBanca.lucroReais || 0).toFixed(2)}
                       </div>
                     </div>
                     <div>
                       <label className="block text-sm font-medium mb-1">Lucro/Prejuízo (Unidades)</label>
                       <div className={`text-2xl font-bold ${newBanca.lucroUnidades >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-                        {newBanca.lucroUnidades >= 0 ? '+' : ''}{newBanca.lucroUnidades.toFixed(2)}u
+                        {newBanca.lucroUnidades >= 0 ? '+' : ''}{(newBanca.lucroUnidades || 0).toFixed(2)}u
                       </div>
                     </div>
                   </div>
@@ -3645,7 +3645,7 @@ const CompleteSportsPlatform = () => {
                           <div className="flex items-center gap-4">
                             <span className="flex items-center gap-1">
                               <TrendingUp className="h-4 w-4" />
-                              <strong>Odd: {stat.odd}</strong>
+                              <strong>Odd: {stat.odd || 0}</strong>
                             </span>
                             {stat.result && (
                               <span className={`px-2 py-1 rounded text-xs font-medium ${
@@ -3833,11 +3833,11 @@ const CompleteSportsPlatform = () => {
                           </div>
                           <div>
                             <span className="text-xs text-gray-500 dark:text-gray-400">Valor</span>
-                            <div className="font-medium">R$ {entry.valor.toFixed(2)}</div>
+                            <div className="font-medium">R$ {(entry.valor || 0).toFixed(2)}</div>
                           </div>
                           <div>
                             <span className="text-xs text-gray-500 dark:text-gray-400">Odds</span>
-                            <div className="font-medium">{entry.odds}</div>
+                            <div className="font-medium">{entry.odds || 0}</div>
                           </div>
                           <div>
                             <span className="text-xs text-gray-500 dark:text-gray-400">Resultado</span>
@@ -3848,13 +3848,13 @@ const CompleteSportsPlatform = () => {
                           <div>
                             <span className="text-xs text-gray-500 dark:text-gray-400">Lucro R$</span>
                             <div className={`font-bold ${entry.lucroReais >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-                              {entry.lucroReais >= 0 ? '+' : ''}{entry.lucroReais.toFixed(2)}
+                              {entry.lucroReais >= 0 ? '+' : ''}{(entry.lucroReais || 0).toFixed(2)}
                             </div>
                           </div>
                           <div>
                             <span className="text-xs text-gray-500 dark:text-gray-400">Lucro Un.</span>
                             <div className={`font-bold ${entry.lucroUnidades >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-                              {entry.lucroUnidades >= 0 ? '+' : ''}{entry.lucroUnidades.toFixed(2)}u
+                              {entry.lucroUnidades >= 0 ? '+' : ''}{(entry.lucroUnidades || 0).toFixed(2)}u
                             </div>
                           </div>
                         </div>
@@ -3943,11 +3943,11 @@ const CompleteSportsPlatform = () => {
                           </div>
                           <div>
                             <span className="text-xs text-gray-500 dark:text-gray-400">Valor</span>
-                            <div className="font-medium">R$ {entry.valor.toFixed(2)}</div>
+                            <div className="font-medium">R$ {(entry.valor || 0).toFixed(2)}</div>
                           </div>
                           <div>
                             <span className="text-xs text-gray-500 dark:text-gray-400">Odds</span>
-                            <div className="font-medium">{entry.odds}</div>
+                            <div className="font-medium">{entry.odds || 0}</div>
                           </div>
                           <div>
                             <span className="text-xs text-gray-500 dark:text-gray-400">Resultado</span>
@@ -3958,13 +3958,13 @@ const CompleteSportsPlatform = () => {
                           <div>
                             <span className="text-xs text-gray-500 dark:text-gray-400">Lucro R$</span>
                             <div className={`font-bold ${entry.lucroReais >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-                              {entry.lucroReais >= 0 ? '+' : ''}{entry.lucroReais.toFixed(2)}
+                              {entry.lucroReais >= 0 ? '+' : ''}{(entry.lucroReais || 0).toFixed(2)}
                             </div>
                           </div>
                           <div>
                             <span className="text-xs text-gray-500 dark:text-gray-400">Lucro Un.</span>
                             <div className={`font-bold ${entry.lucroUnidades >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-                              {entry.lucroUnidades >= 0 ? '+' : ''}{entry.lucroUnidades.toFixed(2)}u
+                              {entry.lucroUnidades >= 0 ? '+' : ''}{(entry.lucroUnidades || 0).toFixed(2)}u
                             </div>
                           </div>
                         </div>
