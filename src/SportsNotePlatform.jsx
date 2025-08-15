@@ -1,5 +1,5 @@
 import React, { useState, useMemo, useEffect } from 'react';
-import { Search, Plus, Calendar, Users, Trophy, User, FileText, Edit2, Trash2, Tag, X, Settings, Download, Upload, Moon, Sun, Star, Copy, BarChart3, Bell, Clock, TrendingUp, FolderOpen, HelpCircle, Building, Globe, Filter, DollarSign, PiggyBank, TrendingDown, Target, Activity, CheckCircle, Save } from 'lucide-react';
+import { Search, Plus, Calendar, Users, Trophy, User, FileText, Edit2, Trash2, Tag, X, Settings, Download, Upload, Moon, Sun, Star, Copy, BarChart3, Bell, Clock, TrendingUp, FolderOpen, HelpCircle, Building, Globe, Filter, DollarSign, PiggyBank, TrendingDown, Target, Activity, CheckCircle, Save, AlertTriangle } from 'lucide-react';
 
 const CompleteSportsPlatform = () => {
   // Cores predefinidas para os esportes
@@ -35,11 +35,23 @@ const CompleteSportsPlatform = () => {
     theme: 'light',
     autoSave: true,
     autoBackup: true,
+    autoBackupInterval: 5, // minutos
+    lastBackup: null,
+    showBackupReminder: true,
+    askBeforeClose: true, // Perguntar antes de fechar
     saveLocation: 'browser',
     backupFolder: null,
-    firstRun: false,
+    firstRun: true,
     valorUnidade: 100
   });
+
+  const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
+  const [lastAutoBackup, setLastAutoBackup] = useState(null);
+  const [showBackupModal, setShowBackupModal] = useState(false);
+  const [isFirstTimeSetup, setIsFirstTimeSetup] = useState(false);
+  const [showToast, setShowToast] = useState(false);
+  const [toastMessage, setToastMessage] = useState('');
+  const [isBackingUp, setIsBackingUp] = useState(false);
 
   const [currentView, setCurrentView] = useState('notes');
   const [activeComprovacao, setActiveComprovacao] = useState(null);
@@ -262,12 +274,44 @@ const CompleteSportsPlatform = () => {
 
   const [newBanca, setNewBanca] = useState(getInitialBancaState());
 
-  // Carregar dados salvos
+  // Carregar dados salvos e verificar primeira execução
   useEffect(() => {
     const savedData = localStorage.getItem('sportsNotes');
     const savedConfig = localStorage.getItem('sportsNotesConfig');
+    const emergencyBackup = localStorage.getItem('sportsNotesEmergencyBackup');
     
-    if (savedData) {
+    // Verificar se existe backup de emergência
+    if (emergencyBackup) {
+      const emergency = JSON.parse(emergencyBackup);
+      const emergencyDate = new Date(emergency.exportDate);
+      const now = new Date();
+      const hoursDiff = (now - emergencyDate) / (1000 * 60 * 60);
+      
+      // Se o backup de emergência tem menos de 24 horas
+      if (hoursDiff < 24) {
+        if (window.confirm('Foi detectado um backup de emergência recente. Deseja restaurá-lo?')) {
+          setNotes(emergency.notes || []);
+          setStatistics(emergency.statistics || []);
+          setReminders(emergency.reminders || []);
+          setSports(emergency.sports || []);
+          setBancaEntries(emergency.bancaEntries || []);
+          setComprovacoes(emergency.comprovacoes || []);
+          
+          // Limpar backup de emergência após restauração
+          localStorage.removeItem('sportsNotesEmergencyBackup');
+          
+          setToastMessage('Backup de emergência restaurado com sucesso!');
+          setShowToast(true);
+          setTimeout(() => setShowToast(false), 3000);
+        } else {
+          // Limpar backup de emergência se recusado
+          localStorage.removeItem('sportsNotesEmergencyBackup');
+        }
+      } else {
+        // Limpar backup de emergência se muito antigo
+        localStorage.removeItem('sportsNotesEmergencyBackup');
+      }
+    } else if (savedData) {
       const data = JSON.parse(savedData);
       setNotes(data.notes || []);
       setStatistics(data.statistics || []);
@@ -280,43 +324,161 @@ const CompleteSportsPlatform = () => {
     if (savedConfig) {
       const loadedConfig = JSON.parse(savedConfig);
       setConfig(loadedConfig);
+      
+      // Se é primeira execução, mostrar modal de configuração
+      if (loadedConfig.firstRun) {
+        setIsFirstTimeSetup(true);
+        setShowBackupModal(true);
+      }
+    } else {
+      // Primeira vez usando o sistema
+      setIsFirstTimeSetup(true);
+      setShowBackupModal(true);
     }
   }, []);
 
+  // Função para criar backup
+  const createBackup = async (isAutomatic = false) => {
+    setIsBackingUp(true);
+    
+    try {
+      const dataToExport = {
+        notes,
+        statistics,
+        reminders,
+        sports,
+        bancaEntries,
+        comprovacoes,
+        exportDate: new Date().toISOString(),
+        version: '2.0',
+        automatic: isAutomatic
+      };
+      
+      const blob = new Blob([JSON.stringify(dataToExport, null, 2)], { 
+        type: 'application/json' 
+      });
+      
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      const dateStr = new Date().toISOString().replace(/[:.]/g, '-').slice(0, -5);
+      a.download = `sports-backup-${isAutomatic ? 'auto-' : ''}${dateStr}.json`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      
+      // Atualizar último backup
+      const newConfig = {
+        ...config,
+        lastBackup: new Date().toISOString()
+      };
+      setConfig(newConfig);
+      localStorage.setItem('sportsNotesConfig', JSON.stringify(newConfig));
+      setLastAutoBackup(new Date());
+      setHasUnsavedChanges(false);
+      
+      // Mostrar notificação
+      setToastMessage(isAutomatic ? 'Backup automático realizado!' : 'Backup criado com sucesso!');
+      setShowToast(true);
+      setTimeout(() => setShowToast(false), 3000);
+      
+      return true;
+    } catch (error) {
+      console.error('Erro ao criar backup:', error);
+      setToastMessage('Erro ao criar backup!');
+      setShowToast(true);
+      setTimeout(() => setShowToast(false), 3000);
+      return false;
+    } finally {
+      setIsBackingUp(false);
+    }
+  };
+
+  // Configurar evento beforeunload para avisar antes de fechar
+  useEffect(() => {
+    const handleBeforeUnload = (e) => {
+      if (config.askBeforeClose && hasUnsavedChanges) {
+        const message = 'Você tem alterações não salvas. Deseja fazer um backup antes de sair?';
+        e.preventDefault();
+        e.returnValue = message;
+        
+        // Tentar fazer backup automático se configurado
+        if (config.autoBackup) {
+          // Criar um backup de emergência sem notificação
+          const dataToExport = {
+            notes,
+            statistics,
+            reminders,
+            sports,
+            bancaEntries,
+            comprovacoes,
+            exportDate: new Date().toISOString(),
+            version: '2.0',
+            emergency: true
+          };
+          
+          // Salvar no localStorage como backup de emergência
+          localStorage.setItem('sportsNotesEmergencyBackup', JSON.stringify(dataToExport));
+        }
+        
+        return message;
+      }
+    };
+
+    // Adicionar listener para teclas de atalho para backup rápido
+    const handleKeyDown = (e) => {
+      // Ctrl+S ou Cmd+S para backup rápido
+      if ((e.ctrlKey || e.metaKey) && e.key === 's') {
+        e.preventDefault();
+        if (hasUnsavedChanges) {
+          createBackup(false);
+        }
+      }
+    };
+
+    window.addEventListener('beforeunload', handleBeforeUnload);
+    window.addEventListener('keydown', handleKeyDown);
+    
+    return () => {
+      window.removeEventListener('beforeunload', handleBeforeUnload);
+      window.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [config.askBeforeClose, hasUnsavedChanges, config.autoBackup, notes, statistics, reminders, sports, bancaEntries, comprovacoes]);
+
+  // Auto-backup em intervalos regulares
+  useEffect(() => {
+    if (config.autoBackup && config.autoBackupInterval > 0) {
+      const interval = setInterval(() => {
+        if (hasUnsavedChanges) {
+          createBackup(true);
+          console.log('Backup automático realizado');
+        }
+      }, config.autoBackupInterval * 60 * 1000); // Converter minutos para milissegundos
+      
+      return () => clearInterval(interval);
+    }
+  }, [config.autoBackup, config.autoBackupInterval, hasUnsavedChanges]);
+
+  // Marcar mudanças não salvas quando dados mudam
+  useEffect(() => {
+    if (!isFirstTimeSetup) {
+      setHasUnsavedChanges(true);
+    }
+  }, [notes, statistics, reminders, sports, bancaEntries, comprovacoes]);
+
   // Auto-save
   useEffect(() => {
-    if (config.autoSave) {
+    if (config.autoSave && !isFirstTimeSetup) {
       const dataToSave = { notes, statistics, reminders, sports, bancaEntries, comprovacoes };
       localStorage.setItem('sportsNotes', JSON.stringify(dataToSave));
       localStorage.setItem('sportsNotesConfig', JSON.stringify(config));
     }
-  }, [notes, statistics, reminders, sports, bancaEntries, comprovacoes, config]);
+  }, [notes, statistics, reminders, sports, bancaEntries, comprovacoes, config, isFirstTimeSetup]);
 
   // Funções de exportação e importação
   const exportData = () => {
-    const dataToExport = {
-      notes,
-      statistics,
-      reminders,
-      sports,
-      bancaEntries,
-      comprovacoes,
-      exportDate: new Date().toISOString(),
-      version: '2.0'
-    };
-    
-    const blob = new Blob([JSON.stringify(dataToExport, null, 2)], { 
-      type: 'application/json' 
-    });
-    
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `sports-platform-backup-${new Date().toISOString().split('T')[0]}.json`;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
+    createBackup(false);
   };
 
   const handleImportFile = (event) => {
@@ -1488,15 +1650,45 @@ const CompleteSportsPlatform = () => {
           <div className={`rounded-lg shadow-sm p-6 mb-6 ${config.theme === 'dark' ? 'bg-gray-800' : 'bg-white'}`}>
             <div className="flex justify-between items-start">
               <div>
-                <h1 className="text-3xl font-bold mb-2">Plataforma de Apostas</h1>
+                <h1 className="text-3xl font-bold mb-2">
+                  Plataforma de Apostas
+                  {hasUnsavedChanges && (
+                    <span className="ml-3 text-sm font-normal text-orange-500">
+                      • Alterações não salvas
+                    </span>
+                  )}
+                </h1>
                 <p className={config.theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}>
                   Gerencie anotações, estatísticas, lembretes e sua banca profissional
                 </p>
+                {lastAutoBackup && (
+                  <p className="text-xs text-green-600 mt-1">
+                    ✓ Último backup automático: {lastAutoBackup.toLocaleTimeString('pt-BR')}
+                  </p>
+                )}
               </div>
               <div className="flex gap-2">
+                {hasUnsavedChanges && !isBackingUp && (
+                  <button
+                    onClick={() => createBackup(false)}
+                    className="flex items-center gap-2 px-4 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 animate-pulse"
+                  >
+                    <Save className="h-4 w-4" />
+                    Backup
+                  </button>
+                )}
+                {isBackingUp && (
+                  <div className="flex items-center gap-2 px-4 py-2 bg-gray-600 text-white rounded-lg">
+                    <div className="animate-spin">
+                      <Save className="h-4 w-4" />
+                    </div>
+                    Salvando...
+                  </div>
+                )}
                 <button
                   onClick={exportData}
                   className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700"
+                  disabled={isBackingUp}
                 >
                   <Download className="h-4 w-4" />
                   Exportar
@@ -1509,11 +1701,13 @@ const CompleteSportsPlatform = () => {
                     accept=".json"
                     onChange={handleImportFile}
                     className="hidden"
+                    disabled={isBackingUp}
                   />
                 </label>
                 <button
                   onClick={() => setShowSettings(true)}
                   className={`p-2 rounded-lg ${config.theme === 'dark' ? 'bg-gray-700 hover:bg-gray-600' : 'bg-gray-100 hover:bg-gray-200'}`}
+                  disabled={isBackingUp}
                 >
                   <Settings className="h-5 w-5" />
                 </button>
@@ -2311,10 +2505,94 @@ const CompleteSportsPlatform = () => {
             )}
           </div>
 
+          {/* Modal de Configuração de Backup Inicial */}
+          {showBackupModal && isFirstTimeSetup && (
+            <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+              <div className={`rounded-lg p-6 w-full max-w-md mx-4 ${config.theme === 'dark' ? 'bg-gray-800' : 'bg-white'}`}>
+                <h2 className="text-2xl font-bold mb-4">Bem-vindo à Plataforma de Apostas!</h2>
+                <p className="mb-6">Configure como deseja salvar seus backups para proteger seus dados:</p>
+                
+                <div className="space-y-4">
+                  <div className="p-4 border rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer">
+                    <label className="flex items-start gap-3">
+                      <input
+                        type="checkbox"
+                        checked={config.autoBackup}
+                        onChange={(e) => setConfig({...config, autoBackup: e.target.checked})}
+                        className="mt-1"
+                      />
+                      <div>
+                        <div className="font-medium">Backup Automático</div>
+                        <div className="text-sm text-gray-600 dark:text-gray-400">
+                          Criar backup automaticamente a cada {config.autoBackupInterval} minutos
+                        </div>
+                      </div>
+                    </label>
+                  </div>
+
+                  <div className="p-4 border rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer">
+                    <label className="flex items-start gap-3">
+                      <input
+                        type="checkbox"
+                        checked={config.askBeforeClose}
+                        onChange={(e) => setConfig({...config, askBeforeClose: e.target.checked})}
+                        className="mt-1"
+                      />
+                      <div>
+                        <div className="font-medium">Avisar antes de fechar</div>
+                        <div className="text-sm text-gray-600 dark:text-gray-400">
+                          Perguntar se deseja fazer backup ao fechar a página
+                        </div>
+                      </div>
+                    </label>
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium mb-2">Intervalo de Backup (minutos)</label>
+                    <input
+                      type="number"
+                      min="1"
+                      max="60"
+                      value={config.autoBackupInterval}
+                      onChange={(e) => setConfig({...config, autoBackupInterval: parseInt(e.target.value) || 5})}
+                      className={`w-full px-3 py-2 border rounded-lg ${
+                        config.theme === 'dark' 
+                          ? 'bg-gray-700 border-gray-600 text-white' 
+                          : 'bg-white border-gray-300'
+                      }`}
+                    />
+                  </div>
+
+                  <div className="p-3 bg-yellow-50 dark:bg-yellow-900/20 rounded-lg">
+                    <p className="text-sm text-yellow-800 dark:text-yellow-200">
+                      ⚠️ <strong>Importante:</strong> Por segurança do navegador, os backups serão baixados automaticamente para sua pasta de Downloads. Recomendamos mover os arquivos para uma pasta segura.
+                    </p>
+                  </div>
+                </div>
+
+                <div className="flex gap-3 justify-end mt-6">
+                  <button
+                    onClick={() => {
+                      const newConfig = {...config, firstRun: false};
+                      setConfig(newConfig);
+                      localStorage.setItem('sportsNotesConfig', JSON.stringify(newConfig));
+                      setShowBackupModal(false);
+                      setIsFirstTimeSetup(false);
+                    }}
+                    className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+                  >
+                    Confirmar e Continuar
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Modal de Configurações */}
           {/* Modal de Configurações */}
           {showSettings && (
             <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-              <div className={`rounded-lg p-6 w-full max-w-md mx-4 ${config.theme === 'dark' ? 'bg-gray-800' : 'bg-white'}`}>
+              <div className={`rounded-lg p-6 w-full max-w-md mx-4 max-h-[90vh] overflow-y-auto ${config.theme === 'dark' ? 'bg-gray-800' : 'bg-white'}`}>
                 <h2 className="text-2xl font-bold mb-4">Configurações</h2>
                 
                 <div className="space-y-4">
@@ -2367,16 +2645,81 @@ const CompleteSportsPlatform = () => {
                     </p>
                   </div>
 
-                  <div>
-                    <label className="flex items-center gap-2">
-                      <input
-                        type="checkbox"
-                        checked={config.autoSave}
-                        onChange={(e) => setConfig({...config, autoSave: e.target.checked})}
-                        className="rounded"
-                      />
-                      <span>Salvamento automático</span>
-                    </label>
+                  <div className="border-t pt-4">
+                    <h3 className="font-medium mb-3">Configurações de Backup</h3>
+                    
+                    <div className="space-y-3">
+                      <label className="flex items-center gap-2">
+                        <input
+                          type="checkbox"
+                          checked={config.autoSave}
+                          onChange={(e) => setConfig({...config, autoSave: e.target.checked})}
+                          className="rounded"
+                        />
+                        <span>Salvamento automático (local)</span>
+                      </label>
+
+                      <label className="flex items-center gap-2">
+                        <input
+                          type="checkbox"
+                          checked={config.autoBackup}
+                          onChange={(e) => setConfig({...config, autoBackup: e.target.checked})}
+                          className="rounded"
+                        />
+                        <span>Backup automático (download)</span>
+                      </label>
+
+                      <label className="flex items-center gap-2">
+                        <input
+                          type="checkbox"
+                          checked={config.askBeforeClose}
+                          onChange={(e) => setConfig({...config, askBeforeClose: e.target.checked})}
+                          className="rounded"
+                        />
+                        <span>Avisar antes de fechar a página</span>
+                      </label>
+
+                      {config.autoBackup && (
+                        <div>
+                          <label className="block text-sm font-medium mb-1">Intervalo de Backup (minutos)</label>
+                          <input
+                            type="number"
+                            min="1"
+                            max="60"
+                            value={config.autoBackupInterval}
+                            onChange={(e) => setConfig({...config, autoBackupInterval: parseInt(e.target.value) || 5})}
+                            className={`w-full px-3 py-2 border rounded-lg ${
+                              config.theme === 'dark' 
+                                ? 'bg-gray-700 border-gray-600 text-white' 
+                                : 'bg-white border-gray-300'
+                            }`}
+                          />
+                        </div>
+                      )}
+
+                      {config.lastBackup && (
+                        <div className="text-sm text-gray-600 dark:text-gray-400">
+                          Último backup: {new Date(config.lastBackup).toLocaleString('pt-BR')}
+                        </div>
+                      )}
+
+                      <button
+                        onClick={() => createBackup(false)}
+                        className="w-full px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 flex items-center justify-center gap-2"
+                      >
+                        <Download className="h-4 w-4" />
+                        Fazer Backup Agora
+                      </button>
+                    </div>
+                  </div>
+
+                  <div className="p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
+                    <p className="text-xs text-blue-800 dark:text-blue-200">
+                      💡 <strong>Dica:</strong> Os backups são salvos na pasta Downloads. Mova-os para um local seguro regularmente.
+                    </p>
+                    <p className="text-xs text-blue-800 dark:text-blue-200 mt-2">
+                      ⌨️ <strong>Atalho:</strong> Use Ctrl+S (ou Cmd+S no Mac) para fazer backup rápido.
+                    </p>
                   </div>
                 </div>
 
@@ -4034,6 +4377,16 @@ const CompleteSportsPlatform = () => {
               </>
             )}
           </div>
+
+          {/* Toast de Notificação */}
+          {showToast && (
+            <div className="fixed bottom-4 right-4 z-50 animate-pulse">
+              <div className="bg-green-600 text-white px-6 py-3 rounded-lg shadow-lg flex items-center gap-2">
+                <CheckCircle className="h-5 w-5" />
+                {toastMessage}
+              </div>
+            </div>
+          )}
         </div>
       </div>
     </div>
