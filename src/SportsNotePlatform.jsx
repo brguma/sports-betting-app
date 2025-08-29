@@ -766,4 +766,10 @@ const CompleteSportsPlatform = () => {
       filtered = filtered.filter(note => note.favorite);
     }
 
-    filtered.sort((a, b) =>
+    filtered.sort((a, b) => {
+      if (sortBy === 'date') {
+        return new Date(b.date) - new Date(a.date);
+      } else if (sortBy === 'year') {
+        return b.year - a.year;
+      } else if (sortBy === 'player') {
+        return (a.player || '').
