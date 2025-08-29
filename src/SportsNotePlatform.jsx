@@ -756,3 +756,14 @@ const CompleteSportsPlatform = () => {
         note.content.toLowerCase().includes(term) ||
         (note.player && note.player.toLowerCase().includes(term)) ||
         (note.team && note.team.toLowerCase().includes(term)) ||
+        note.championship.toLowerCase().includes(term) ||
+        note.tags.some(tag => tag.toLowerCase().includes(term)) ||
+        (note.confrontoTeams && note.confrontoTeams.some(team => team.toLowerCase().includes(term)))
+      );
+    }
+
+    if (sortBy === 'favorite') {
+      filtered = filtered.filter(note => note.favorite);
+    }
+
+    filtered.sort((a, b) =>
